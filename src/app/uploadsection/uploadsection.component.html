@@ -1,0 +1,932 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white" style="border-bottom:5px solid #328bff;height: 80px;">
+  <!-- Container wrapper -->
+  <div class="container-fluid">
+    <!-- Toggle button -->
+    <button class="navbar-toggler" type="button" data-mdb-toggle="collapse" data-mdb-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Collapsible wrapper -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- Navbar brand -->
+      <a class="navbar-brand mt-2 mt-lg-0" href="#">
+        <img src="assets/logo.png" style="width:100px;
+            height: 100%;" alt="HTC Logo" loading="lazy" />
+      </a>
+      <!-- Left links -->
+      <!-- Left links -->
+    </div>
+    <!-- Collapsible wrapper -->
+
+    <!-- Right elements -->
+    <div class="d-flex align-items-center" style="margin-right:30px">
+
+      <div class="dropdown">
+        <a class="link-secondary me-3 dropdown-toggle hidden-arrow" id="navbarDropdownMenuAvatar" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <i class='bx bxs-calendar calan' aria-expanded="false" (click)="chanebtn()"></i>
+        </a>
+        <ul class="dropdown-menu list" aria-labelledby="navbarDropdownMenuAvatar">
+          <li><i class='bx bx-upload uploadicon'></i>
+            <input #dateInput type="file" style="display:none" (change)="ondate($event)" />
+            <button (click)="dateInput.click()" class="uploadbtn" type="submit" [disabled]="!disbledatebtn"
+              (mouseenter)="mouseEnter()">Upload Holiday File</button>
+          </li>
+          <hr class="iconBorder">
+          <li *ngFor="let year of uniqueArray"><a class="dropdown-item"><i class='bx bxs-calendar calenicon'
+                (click)="getyear(year)"></i>&nbsp;<span class="iconText" (click)="getyear(year)">{{year}}</span></a>
+            <hr class="iconBorderone">
+          </li>
+        </ul>
+      </div>
+      <div class="dropdown">
+        <a class="link-secondary me-3 dropdown-toggle hidden-arrow" id="navbarDropdownMenuAvatar" role="button"
+          data-bs-toggle="dropdown" aria-expanded="false">
+          <i class='bx bxs-file-export exfile' aria-expanded="false" (click)="chanebtn()"></i>
+        </a>
+        <ul class="dropdown-menu template" aria-labelledby="navbarDropdownMenuAvatar">
+          <li><a class="dropdown-item temp"><span class="filedataone">Template File</span></a></li>
+          <li><a class="dropdown-item"><i class='bx bxs-file-doc filedataicon'
+                (click)="getHolidaytemplate()">&nbsp;<span class="filedatatwo">Hoilday File</span></i></a></li>
+          <hr class="iconBordertwo">
+          <li><a class="dropdown-item"><i class='bx bxs-file-doc filedataicon'
+                (click)="getProjectTemplate()">&nbsp;<span class="filedatatwo">Project Activity File</span></i></a></li>
+          <hr class="iconBordertwo">
+          <li><a class="dropdown-item"><i class='bx bxs-file-pdf filedataicon'>&nbsp;<span
+                  class="filedatatwo" (click)="openPDF()">User Manual</span></i></a></li>
+          <hr class="iconBordertwo">
+        </ul>
+      </div>
+      <a class="link-secondary me-3" href="#">
+        <i class='bx bx-refresh referbtn' (click)="refersh()"></i>
+      </a>
+
+    </div>
+    <!-- Right elements -->
+  </div>
+  <!-- Container wrapper -->
+</nav>
+
+<body>
+
+  <div class="container d-flex align-items-center" *ngIf="datafromexcel">
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <div class="card wrapper">
+          <h5 class="card-title headerone">Upload project Activity File</h5>
+          <div class="card-body">
+            <div class="from" *ngIf="fileuploading">
+              <input #fileInput type="file" style="display:none" (change)="onFileChange($event)" />
+              <i class='bx bx-cloud-upload'></i>
+              <button (click)="fileInput.click()" class="btn" type="submit" style="color:green;margin-top:2px"
+                [disabled]="!disblebtn">Browse Excel File to
+                Upload </button>
+            </div>
+            <section class="progress-area" *ngIf="datebar">
+              <p>Holiday File Uploading</p> &nbsp;
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar progress-bar-striped bg-custom" role="datebar" id="mydateBar"
+                  aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </section>&nbsp;
+
+            <section class="progress-area" *ngIf="progressbar">
+              <p>File Uploading</p> &nbsp;
+              <div class="progress" style="height: 10px;">
+                <div class="progress-bar progress-bar-striped bg-success" role="progressbar" id="myBar"
+                  aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </section>&nbsp;
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container d-flex align-items-center" *ngIf="uploadsection">
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <div class="card wrapperone">
+          <i class='bx bx-arrow-back backarr' (click)="backTopage()"></i>
+          <h5 class="card-title header">Upload File</h5>
+          <div class="card-body">
+            <div class="fromone">
+              <span><i class='bx bxs-file icon'>
+                </i>
+                <p class="file">{{filename}}</p>
+                <p class="filesize">{{size | number: '1.0-0'}}kb - &nbsp;<span style="font-size:15px">File
+                    Details</span></p>
+              </span>
+              <div class="form-check check" *ngIf="checkBoxvalue">
+                <input class="form-check-input" type="checkbox" value="" id="checkval" (change)="checkbox()" />
+                <label class="form-check-label text-muted checkinput" for="flexCheckDefault">Do you want give  Acceptance date Range ,QA &
+                  Buffer value? </label>
+              </div>
+
+
+            </div>
+
+            <div class="row" *ngIf="showQAform" style="margin-left: 4px;">
+              <div class="col-md-6 mb-4">
+                <div class="form-outline">
+                  <input type="number"  class="form-control textvalue"
+                    placeholder="Enter Acceptance range" id="acceptValue" (keyup)="checkAccpetRange()" />
+                    <p *ngIf="errAccept" class="ErrAccept">Range Should be 3 to 5 days only</p>
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="form-outline">
+                  <input type="number"  class="form-control textvalue" placeholder="Enter QA Value"
+                    id="qavalue" />
+                </div>
+              </div>
+              <div class="col-md-6 mb-4">
+                <div class="form-outline">
+                  <input type="number"class="form-control textvalue"
+                    placeholder="Enter Buffer value" id="buffervalue" />
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="btn-toolbar " role="toolbar" aria-label="Toolbar with button groups">
+                <button class="btn-group mr-2 progress-btn" data-progress-style="fill-bottom" id="progressBtn"
+                  (click)="generate()" role="group" aria-label="First group" *ngIf="generatebtn" [disabled]="errAccept">
+                  <div class="btn">Generate</div>
+                  <div class="progress"></div>
+
+                </button>
+                <div *ngIf="dwnbtn">
+                  <button class="progress-btnone" data-progress-style="fill-top" id="progressBtnone"
+                    (click)="downloadbar()" role="group" aria-label="First group">Download
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+    
+</body>
+<div *ngIf="headervis" style="margin-top: 54px;">
+  <ul class="nav nav-tabs overflow-x border-0 topnav">
+    <li class="nav-item "> <a [ngClass]="[btnStyle]" (click)="tableview()">Project-Activty</a> </li>
+    <li class="nav-item "> <a [ngClass]="[btnStyle1]" (click)="tableviewone()">RBWO</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle2]" (click)="tableviewtwo()">Time Line</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle3]" (click)="tableviewthree()">PTE</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle4]" (click)="tableviewfour()">PPM</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle5]" (click)="tableviewfive()">Milestones & Deliverables</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle7]" (click)="tableviewseven()">Payment Schedule</a> </li>
+    <li class="nav-item"> <a [ngClass]="[btnStyle6]" (click)="tableviewsix()">Effort Spend</a> </li>
+
+
+  </ul>
+</div>
+<div class="table-responsive">
+
+  <table class="table table-hover table-nowrap" *ngIf="datavis">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Phase</th>
+        <th scope="col">Deliverable</th>
+        <th scope="col">Activity</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Effort</th>
+        <th scope="col">Acceptance Date</th>
+        <th scope="col">Remark</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of dataString index as i">
+      <tr>
+        <td>{{i+1}}</td>
+        <td>{{data.Phase}}</td>
+        <td>{{data.Deliverable}}</td>
+        <td>{{data.Activity}}</td>
+        <td [ngClass]="{'StartDate': isstartDate(data?.StartDate)}">{{data?.StartDate | date: 'dd-MM-yyyy'}}</td>
+        <td [ngClass]="{'EndDate': isendDate(data?.EndDate)}">{{data.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{data.Effort}}</td>
+        <td [ngClass]="{'AcceptDate': isAcceptDate(data?.AcceptanceDate)}">{{data.AcceptanceDate | date: 'dd-MM-yyyy'}}
+        </td>
+        <td>
+          <p *ngIf="!data.Phase" style="color:#F08080  ;font-weight: bold">*Phase not available</p>
+          <p *ngIf="!data.Deliverable" style="color:#F08080  ;font-weight: bold">*Deliverable not available</p>
+          <p *ngIf="!data.Activity" style="color:#F08080  ;font-weight: bold">*Activity not available</p>
+          <p *ngIf="!data.StartDate" style="color:#F08080  ;font-weight: bold">*StartDate not available</p>
+          <p *ngIf="!data.EndDate" style="color:#F08080  ;font-weight: bold">*EndDate not available</p>
+          <p *ngIf="!data.Effort" style="color:#F08080  ;font-weight: bold">*Effort not available</p>
+          <p *ngIf="!data.AcceptanceDate" style="color:#F08080  ;font-weight: bold">*AcceptanceDate not available</p>
+          <p *ngIf="data.StartDate > data.EndDate" style="color:#F08080  ;font-weight: bold">*End Date should be greater
+            then start date</p>
+          <p *ngIf="data.AcceptanceDate < data.EndDate" style="color:#F08080  ;font-weight: bold">*Acceptance Date
+            should be greater or equal to end date </p>
+          <p *ngIf="weekStartdate" style="color:#F08080  ;font-weight: bold">*Start Date Should weekday</p>
+          <p *ngIf="weekEnddate" style="color:#F08080  ;font-weight: bold">*End Date should weekdays</p>
+          <p *ngIf="weekAcceptdate" style="color:#F08080  ;font-weight: bold">*AcceptDate should weekdays</p>
+
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table1">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Phase</th>
+        <th scope="col">Deliverable</th>
+        <th scope="col">Activity</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Effort</th>
+        <th scope="col">Acceptance Date</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of dataString index as i">
+      <tr>{{calculatemonthwise1(data.StartDate,data.EndDate)}}
+        <td>{{i+1}}</td>
+        <td>{{data.Phase}}</td>
+        <td>{{data.Deliverable}}</td>
+        <td>{{data.Activity}}</td>
+        <td>{{data?.StartDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{data.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{effort}}</td>
+        <td>{{data?.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+
+        <!-- <div> -->
+
+        <td *ngFor="let day of monthArr">
+
+          {{day}}
+
+        </td>
+        <!-- </div> -->
+
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table2">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Phase</th>
+        <th scope="col">Deliverable</th>
+        <th scope="col">Activity</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Effort</th>
+        <th scope="col">Acceptance Date</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of dataString index as i">
+      <tr>
+        <td>{{i+1}}</td>
+        <td>{{data.Phase}}</td>
+        <td>{{data.Deliverable}}</td>
+        <td>{{data.Activity}}</td>
+        <td>{{data?.StartDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{data.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{effort}}</td>
+        <td>{{data?.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+        <td *ngFor="let day of monthArr"
+          [ngClass]="{'green': day !=0 &&  data.Phase ==='Development' ,'red': day !=0 &&  data.Phase ==='Testing'}">
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table3">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Months</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          No of Deliverables
+        </td>
+        <td *ngFor="let emp of deliverableVal">
+          {{emp}}
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          Efforts for the Month
+
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Efforts spend for deliverables
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table4">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Months</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+        <th>Total
+        <th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          Effort for month
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+        <td>{{finaleffort | number : '1.2'}}</td>
+      </tr>
+      <tr>
+        <td>
+          FTE for Month
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{(effort*8)/168 | number : '1.2'}}
+        </td>
+        <td>{{(finaleffort)/168 | number : '1.2'}}</td>
+
+      </tr>
+      <tr>
+        <td>
+          QA % (0) in FTE
+        </td>
+        <td *ngFor="let buf of ftecal">
+          {{buf}}
+        </td>
+        <td>{{0}}</td>
+
+      </tr>
+      <tr>
+        <td>
+          Buffer % (0) in FTE
+        </td>
+        <td *ngFor="let buf of bufferArr">
+          {{buf}}
+        </td>
+        <td>{{(finaleffort)*0}}</td>
+      </tr>
+      <tr>
+
+        <td>
+          Final FTE
+        </td>
+        <td *ngFor="let effort of totalFteArr">
+          {{effort | number : '1.2'}}
+        </td>
+        <td>{{totalFtevalue | number : '1.2'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table5">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">ETS #</th>
+        <th scope="col">Deliverable/Milestone</th>
+        <th scope>Deliverable Description</th>
+        <th scope>Deliverable Due Date</th>
+        <th scope>Acceptance Due Date</th>
+
+      </tr>
+    </thead>
+    <tbody *ngFor="let mile of milestoneArr index as i">
+      <tr>
+        <td>{{i+1}}</td>
+        <td></td>
+        <td>{{mile.Activity}}</td>
+        <td>{{mile.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{mile.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+      </tr>
+      <tr *ngIf="largeMontharr.includes(mile.EndDate)" style="background-color: #ece4e4;">
+        <td></td>
+        <td> Milestone &nbsp;{{calculatemilestone(mile.EndDate)+1}} &nbsp;{{getactivity(mile.EndDate)}}</td>
+        <td></td>
+        <td>{{ mile.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{ mile.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive tabledata" id="table6">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Milestone #</th>
+        <th scope="col">Milestonedate</th>
+        <th scope>Effortsspend</th>
+        <th scope>Effort%/Month</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of largeMontharr ; let k = index">
+        <td># Milestone{{k + 1}}</td>
+        <td>{{i | date: 'dd-MM-yyyy'}}</td>
+        <td>{{endeffortArr[k]*8}}</td>
+        <td>{{endeffortArr[k]/168 | number : '1.2'}}</td>
+
+      </tr>
+
+    </tbody>
+    <tr>
+    </tr>
+    <tr>
+    </tr>
+
+  </table>
+</div>
+
+<!-----table show-->
+
+<div class="table-responsive" *ngIf="tablevisone">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Phase</th>
+        <th scope="col">Deliverable</th>
+        <th scope="col">Activity</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Effort</th>
+        <th scope="col">Acceptance Date</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of dataString index as i">
+      <tr>
+        <td style="display:none">{{calculatemonthwise1(data.StartDate,data.EndDate)}}</td>
+        <td>{{i+1}}</td>
+        <td>{{data.Phase}}</td>
+        <td>{{data.Deliverable}}</td>
+        <td>{{data.Activity}}</td>
+        <td>{{data?.StartDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{data.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{effort}}</td>
+        <td>{{data?.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+
+        <!-- <div> -->
+
+        <td *ngFor="let day of monthArr">
+
+          {{day}}
+
+        </td>
+        <!-- </div> -->
+
+
+      </tr>
+      <tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevistwo">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">S.No</th>
+        <th scope="col">Phase</th>
+        <th scope="col">Deliverable</th>
+        <th scope="col">Activity</th>
+        <th scope="col">Start Date</th>
+        <th scope="col">End Date</th>
+        <th scope="col">Effort</th>
+        <th scope="col">Acceptance Date</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody *ngFor="let data of dataString index as i">
+      <tr>
+        <td style="display:none">{{calculatemonthwise1(data.StartDate,data.EndDate)}}</td>
+        <td>{{i+1}}</td>
+        <td>{{data.Phase}}</td>
+        <td>{{data.Deliverable}}</td>
+        <td>{{data.Activity}}</td>
+        <td>{{data?.StartDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{data.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{effort}}</td>
+        <td>{{data?.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+
+        <!-- <div> -->
+
+        <td *ngFor="let day of monthArr"
+          [ngClass]="{'green': day !=0 &&  data.Phase ==='Development' ,'red': day !=0 &&  data.Phase ==='Testing'}">
+
+
+          <!-- </div> -->
+
+
+      </tr>
+      <tr>
+    </tbody>
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevisthree">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Months</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          No of Deliverables
+        </td>
+        <td *ngFor="let emp of deliverableVal">
+          {{emp}}
+        </td>
+
+      </tr>
+      <tr>
+        <td>
+          Efforts for the Month
+
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Efforts spend for deliverables
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevisfour">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Months</th>
+        <th *ngFor="let month of monthData">{{formatdate(month)}}</th>
+        <th>Total
+        <th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          Effort for month
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{effort*8}}
+        </td>
+        <td>{{finaleffort}}</td>
+      </tr>
+      <tr>
+        <td>
+          FTE for Month
+        </td>
+        <td *ngFor="let effort of effortVal">
+          {{(effort*8)/168 | number : '1.2'}}
+        </td>
+        <td>{{(finaleffort)/168 | number : '1.2'}}</td>
+
+      </tr>
+      <tr>
+        <td>
+          QA % (0) in FTE
+        </td>
+        <td *ngFor="let buf of ftecal">
+          {{buf}}
+        </td>
+        <td>{{totalQAvalue}}</td>
+
+      </tr>
+      <tr>
+        <td>
+          Buffer % (0) in FTE
+        </td>
+        <td *ngFor="let buf of bufferArr">
+          {{buf}}
+        </td>
+        <td>{{totalBuffer}}</td>
+      </tr>
+      <tr>
+
+        <td>
+          Final FTE
+        </td>
+        <td *ngFor="let effort of totalFteArr">
+          {{effort | number : '1.2'}}
+        </td>
+        <td>{{totalFtevalue | number : '1.2'}}</td>
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevisfive">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">ETS #</th>
+        <th scope="col">Deliverable/Milestone</th>
+        <th scope>Deliverable Description</th>
+        <th scope>Deliverable Due Date</th>
+        <th scope>Acceptance Due Date</th>
+
+      </tr>
+    </thead>
+    <tbody *ngFor="let mile of milestoneArr index as i">
+      <tr>
+        <td>{{i+1}}</td>
+        <td></td>
+        <td>{{mile.Activity}}</td>
+        <td>{{mile.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{mile.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+      </tr>
+      <tr *ngIf="largeMontharr.includes(mile.EndDate)" style="background-color: #ece4e4;">
+        <td></td>
+        <td> Milestone - &nbsp;{{calculatemilestone(mile.EndDate)+1}} &nbsp;{{getactivity(mile.EndDate)}}</td>
+        <td></td>
+        <td>{{ mile.EndDate | date: 'dd-MM-yyyy'}}</td>
+        <td>{{ mile.AcceptanceDate | date: 'dd-MM-yyyy'}}</td>
+
+      </tr>
+    </tbody>
+
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevissix">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">Milestone #</th>
+        <th scope="col">Milestonedate</th>
+        <th scope>Effortsspend</th>
+        <th scope>Effort%/Month</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of largeMontharr ; let k = index">
+        <td># Milestone{{k + 1}}</td>
+        <td>{{i | date: 'dd-MM-yyyy'}}</td>
+        <td>{{endeffortArr[k]*8}}</td>
+        <td>{{endeffortArr[k]/168 | number : '1.2'}}</td>
+
+      </tr>
+
+    </tbody>
+    <tr>
+    </tr>
+    <tr>
+    </tr>
+
+  </table>
+</div>
+<div class="table-responsive" *ngIf="tablevisseven">
+
+  <table class="table table-hover table-nowrap">
+
+    <thead class="thead-light filedata">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">MILESTONE / DELIVERABLE</th>
+        <th scope>Milestone Date</th>
+        <th scope>PRICE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let i of largeMontharr ; let k = index">
+        <td>{{k + 1}}</td>
+        <td> Milestone - &nbsp; {{k + 1}}&nbsp;{{getactivity(i)}}</td>
+        <td>{{i | date: 'dd-MM-yyyy'}}</td>
+        <td></td>
+
+      </tr>
+
+    </tbody>
+
+
+  </table>
+</div>
+<table class="table table-hover table-nowrap" style="display:none" id="holidaytableone">
+
+  <thead class="thead-light filedata">
+    <tr>
+      <th scope="col">S.No</th>
+      <th scope="col">Date</th>
+      <th scope="col">Holiday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let event of eventArr index as i">
+      <td>{{i+1}}</td>
+      <td>{{event.Date | date: 'dd-MM-yyyy'}}</td>
+      <td>{{event.Name}}</td>
+
+    </tr>
+
+  </tbody>
+</table>
+
+
+<div class="card text-center" style="margin-top:150px;display:none ; overflow: auto;" id="htmlData">
+  <div class="card-header">
+    <h5 style="font-weight: bold;">User Manual</h5>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title titlecard">Step 1</h5>
+    <div class="row" style="margin-top: 36px;">
+
+
+      <div class="col-md-6">
+        <div class="card-body titleicon">
+          <h5 class="card-title">Holiday File Upload</h5>
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize"> Calender icon </span></p>
+            <h5 class="card-title">Hover Button </h5>
+          <p class="card-text cardtext">
+            Mouse Hover <span class="cardtextsize"> upload Holiday file button </span> and if Holiay data not there in
+            localstorage<span class="cardErr"> you got Error Popup</span></p>
+        </div>
+   
+      </div>
+      <div class="col-md-6">
+        <img src="assets/image2.png" alt="Trendy Pants and Shoes" class="img-fluid rounded-start" />
+      </div>
+    </div>
+  </div>
+
+
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <img src="assets/holiday5.png" alt="Trendy Pants and Shoes" class="img-fluid rounded-start" />
+      </div>
+
+      <div class="col-md-6">
+        <div class="card-body titleicon">
+          <h5 class="card-title">Upload Excel only</h5>
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize">Upload Holiday File button </span> and upload holiday file. <span
+              class="cardErr"> the file should be excel</span>
+              <h5 class="card-title">Only one Sheet</h5>
+              <p class="card-text cardtext">
+                Click <span class="cardtextsize">Upload Holiday File button </span> and upload holiday file. <span
+                  class="cardErr"> the file should have only one Sheet</span>
+              </p>
+    
+              <h5 class="card-title">Sheet Name</h5>
+              Click <span class="cardtextsize">Upload Holiday File button </span> and upload holiday file.<span
+                class="cardErr"> the Sheet name Should be 'Sheet1'</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <h5 class="card-title titlecard">Step 2</h5>
+    <div class="row" style="margin-top: 36px;">
+
+
+      <div class="col-md-6">
+        <div class="card-body titleicon">
+          <h5 class="card-title">Project-Activity File</h5>
+
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize"> Browse Excel file to upload button</span> and upload project activity
+            file. <span class="cardErr"> the file should same as template of project activity file</span>
+          </p>
+        </div>
+          <h5 class="card-title">Upload Excel only</h5>
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize">Browse Excel file to upload button </span> and project activity file. <span
+              class="cardErr"> the file should be excel</span>
+          </p>
+
+          <h5 class="card-title">Only one Sheet</h5>
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize">Browse Excel file to upload button </span> and project activity file <span
+              class="cardErr"> the file should have only one Sheet</span>
+          </p>
+
+          <h5 class="card-title">Sheet Name</h5>
+          Click <span class="cardtextsize">Browse Excel file to upload button </span> and project activity file <span
+            class="cardErr"> the Sheet name Should be 'Sheet1'</span>
+      </div>
+      <div class="col-md-6">
+        <img src="assets/image1.png" alt="Trendy Pants and Shoes" class="img-fluid rounded-start" />
+      </div>
+    </div>
+  </div>
+
+
+  <div class="card-body">
+    <div class="row">
+
+
+      <div class="col-md-6">
+        <div class="card-body titleicon">
+          <h5 class="card-title">Generate</h5>
+          <p class="card-text cardtext">
+            You want to give buffer value you should <span class="cardtextsize"> Enable check box</span> and <span
+              class="cardErr">if dont want to give QA & Buffer value disable check box</span>
+          </p>
+          <p class="card-text cardtext">
+            click <span class="cardtextsize"> Generate button </span> it start to calculate PPM,PTE,Effort <span
+              class="cardErr">if u r missing any filed and start,end,acceptance date should week day and end day should
+              be higher than start and similar to acceptance otherwise
+              you willl get error message in remark file </span>
+          </p>
+
+        </div>
+      </div>
+      <div class="col-md-6">
+        <img src="assets/project6.png" alt="Trendy Pants and Shoes" class="img-fluid rounded-start" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="row" style="margin-top: 36px;">
+      <div class="col-md-6">
+        <img src="assets/project9.png" alt="Trendy Pants and Shoes" class="img-fluid rounded-start" />
+      </div>
+
+      <div class="col-md-6">
+        <div class="card-body titleicon">
+          <h5 class="card-title">Download</h5>
+          <p class="card-text cardtext">
+            Click <span class="cardtextsize">Download Button </span> <span class="cardErr"> Download is
+              processing</span>
+          </p>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
